@@ -13,6 +13,13 @@ const Home: React.FC = () => {
     }, 500);
   }
 
+  const onClickCreateChat = () => {
+    setActive(true)
+    setTimeout(() => {
+      navigate('/create')
+    }, 500);
+  }
+
   return (
     <div className='w-full h-[100vh] flex justify-center items-center flex-wrap overflow-hidden'>
       <div className={active ? 'active flex gap-[150px] wrapper__chat' : 'flex gap-[150px] wrapper__chat'}>
@@ -26,11 +33,11 @@ const Home: React.FC = () => {
         <p className="mt-[20px] text-[20px]">Присоединиться к чату</p>
       </div>
       <div className="text-center">
-        <button className="bg-blue w-[250px] h-[250px] rounded-[50%] flex items-center justify-center create__chat">
+        <button onClick={onClickCreateChat} className="bg-blue w-[250px] h-[250px] rounded-[50%] flex items-center justify-center create__chat">
         <svg width="130" height="130" viewBox="0 0 83 83" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M36.3125 72.625C36.3125 72.625 31.125 72.625 31.125 67.4375C31.125 62.25 36.3125 46.6875 57.0625 46.6875C77.8125 46.6875 83 62.25 83 67.4375C83 72.625 77.8125 72.625 77.8125 72.625H36.3125Z" fill="white"/>
 <path d="M57.0625 41.5C65.6574 41.5 72.625 34.5324 72.625 25.9375C72.625 17.3426 65.6574 10.375 57.0625 10.375C48.4676 10.375 41.5 17.3426 41.5 25.9375C41.5 34.5324 48.4676 41.5 57.0625 41.5Z" fill="white"/>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M27.0599 72.625C26.3295 71.1513 25.9375 69.4043 25.9375 67.4375C25.9375 60.4061 29.4601 53.1747 35.9801 48.1398C33.1279 47.2275 29.8027 46.6875 25.9375 46.6875C5.1875 46.6875 0 62.25 0 67.4375C0 72.625 5.1875 72.625 5.1875 72.625H27.0599Z" fill="white"/>
+<path fillRule="evenodd" clipRule="evenodd" d="M27.0599 72.625C26.3295 71.1513 25.9375 69.4043 25.9375 67.4375C25.9375 60.4061 29.4601 53.1747 35.9801 48.1398C33.1279 47.2275 29.8027 46.6875 25.9375 46.6875C5.1875 46.6875 0 62.25 0 67.4375C0 72.625 5.1875 72.625 5.1875 72.625H27.0599Z" fill="white"/>
 <path d="M23.3438 41.5C30.5062 41.5 36.3125 35.6937 36.3125 28.5312C36.3125 21.3688 30.5062 15.5625 23.3438 15.5625C16.1813 15.5625 10.375 21.3688 10.375 28.5312C10.375 35.6937 16.1813 41.5 23.3438 41.5Z" fill="white"/>
         </svg>
         </button>
