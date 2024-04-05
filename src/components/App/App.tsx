@@ -16,7 +16,7 @@ function App() {
         <Route path='/join' element={<JoinChat />} />
         <Route path='/create' element={<CreateChat />} />
       </Route>
-      <Route path='/chat' element={<Chat />} />
+      <Route path='/connect/chat/:chat_id' element={<Chat />} />
       </>
     ),
   );
