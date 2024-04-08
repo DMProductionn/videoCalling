@@ -1,0 +1,18 @@
+version: '3.10'
+
+
+services:
+  react:
+    container_name: video-platform_frontend
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    volumes:
+      - react_dist:/app/dist
+    ports:
+      - 3000:3000
+
+volumes:
+  react_dist:
+
+    
