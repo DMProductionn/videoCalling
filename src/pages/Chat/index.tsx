@@ -1,59 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import './Chat.scss'
 import VideoParticipants from '../../components/Chat/VideoParticipants';
 import VideoCallActions from '../../components/Chat/VideoCallActions';
 import ChatRightSide from '../../components/Chat/ChatRightSide';
-import { httpWebSocket } from '../../Api/http';
 import { getUsersChat } from '../../services/chat.service';
 import { useQuery } from '@tanstack/react-query';
 
 const Chat: React.FC = () => {
-  const [connectUser, setConnectUser] = useState()
   const [chatId, _] = useState(localStorage.getItem('chatId'))
 
-
-
-  const ws = useRef(null);
-
-  
     const { data } = useQuery({queryKey: ['usersChat'], 
     queryFn: () => getUsersChat(chatId)
   })
-
-  
-  
-
-  ws.current = new WebSocket(`ws://${httpWebSocket.defaults.baseURL}/chat/ws/${chatId}`)
-  
-
-  useEffect(() => {
-
-    const connectWebSocket = () => { 
-    
-      ws.onopen = () => {
-        console.log('WebSocket connection');
-      };
-    
-      ws.onmessage = function(event) {
-        const message = event.data;
-        switch(message.type) {
-          case 'newUserConnected':
-            console.log('Новый пользователь подключен:', message.username);
-            setConnectUser(event.data)
-            break;
-          default:
-            console.log('Получено сообщение:', message);
-        }
-      };
-    
-      ws.onclose = () => {
-        console.log('WebSocket connection closed');
-      };
-    };
-    connectWebSocket()
-    
-    
-  }, []);
 
 
  
