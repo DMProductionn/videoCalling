@@ -1,0 +1,51 @@
+name: Main
+on:
+    push:
+        branches:
+            - main
+jobs:
+  docker_hub:
+    name: Build and push to DockerHub
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: klaxer/video-platform_app_frontend
+
+      - name: Login to Docker Hub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: klaxer/video-platform_app_frontend:latest
+          labels: ${{ steps.meta.outputs.labels }}
+          # build-args: |
+          #   DOCKER_BUILDKIT=1
+          #   BUILDKIT_INLINE_CACHE=1
+          file: Dockerfile.prod
+
+  deploy:
+    needs: docker_hub
+    name: deploy image
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: install ssh keys
+      run: |
+        install -m 600 -D /dev/null ~/.ssh/id_rsa
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
+    - name: connect and pull
+      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && docker compose -f docker-compose.prod.yml down && docker pull klaxer/video-platform_app_frontend:latest && docker compose -f docker-compose.prod.yml up -d && exit"
+    - name: cleanup
+      run: rm -rf ~/.ssh
