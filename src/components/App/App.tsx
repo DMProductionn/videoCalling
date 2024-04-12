@@ -5,6 +5,7 @@ import Layout from '../Layout';
 import JoinChat from '../../pages/JoinChat';
 import CreateChat from '../../pages/CreateChat';
 import Chat from '../../pages/Chat';
+import Test from '../../pages/Test';
 
 function App() {
 
@@ -15,6 +16,7 @@ function App() {
         <Route index element={<Home />} />
         <Route path='/join' element={<JoinChat />} />
         <Route path='/create' element={<CreateChat />} />
+        <Route path='/test' element={<Test />} />
       </Route>
       <Route path='/connect/chat/:chat_id' element={<Chat />} />
       </>

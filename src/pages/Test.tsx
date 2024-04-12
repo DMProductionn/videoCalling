@@ -1,190 +1,93 @@
-// import React, { Component } from 'react';
-// import Peer from 'simple-peer'
-// import io from 'socket.io-client'
+import React, { useState } from "react";
 
-// const debug = require('debug')('screen-share:app')
+const Test = () => {
+  const xRange = { min: 50, max: 250 }; // диапазон по оси x
+  const yRange = { min: 50, max: 150 }; // диапазон по оси y
 
-// const ioUrl = 'http://localhost:4000/'
-// const enableTrickle = true
+  const scale = {
+    x: 250 / (xRange.max - xRange.min),
+    y: 200 / (yRange.max - yRange.min),
+  };
 
-// class VideoChat extends Component {
+  const points = [
+    { letter: 'A', x: 100, y: 200 },
+    { letter: 'B', x: 150, y: 100 },
+    { letter: 'C', x: 200, y: 100 },
+    { letter: 'D', x: 250, y: 100 },
+    { letter: 'E', x: 300, y: 100 },
+    { letter: 'F', x: 250, y: 150 },
+    { letter: 'G', x: 200, y: 200 },
+    { letter: 'H', x: 150, y: 200 },
+    { letter: 'I', x: 100, y: 200 },
+    { letter: 'J', x: 150, y: 150 },
+  ];
+  
+  const [connectedPoints, setConnectedPoints] = useState([]);
 
-//   state = {
-//     peers: {},
-//     stream: null
-//   }
+  const handleConnectPoints = (letters) => {
+    const splitLetters = letters.split('').filter(char => char !== ' ');
 
-//   constructor() {
-//     super()
-//     this.onMedia = this.onMedia.bind(this)
-//     this.createPeer = this.createPeer.bind(this)
-//     this.getMedia(this.onMedia, err => {
-//       this.setState({
-//         mediaErr: 'Could not access webcam'
-//       })
-//       debug('getMedia error', err)
-//     })
-//   }
+    if (splitLetters.length > 1) {
+      const newConnectedPoints = [];
+      
+      for (let i = 0; i < splitLetters.length - 1; i++) {
+        const startIndex = points.findIndex(point => point.letter === splitLetters[i]);
+        const endIndex = points.findIndex(point => point.letter === splitLetters[i + 1]);
 
-//   componentDidUpdate() {
-//     if (this.stream && this.video && !this.video.srcObject) {
-//       debug('set video stream', this.video, this.stream)
-//       this.video.srcObject = this.stream
-//     }
-//     this.attachPeerVideos()
-//   }
+        if (startIndex !== -1 && endIndex !== -1) {
+          newConnectedPoints.push([startIndex, endIndex]);
+        }
+      }
 
-//   attachPeerVideos() {
-//     Object.entries(this.state.peers).forEach(entry => {
-//       const [peerId, peer] = entry
-//       if (peer.video && !peer.video.srcObject && peer.stream) {
-//         debug('setting peer video stream', peerId, peer.stream)
-//         peer.video.setAttribute('data-peer-id', peerId)
-//         peer.video.srcObject = peer.stream
-//       }
-//     })
-//   }
+      setConnectedPoints(newConnectedPoints);
+    }
+  };
 
-//   getMedia(callback, err) {
-//     const options = { video: true, audio: true }
-//     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-//       return navigator.mediaDevices.getUserMedia(options)
-//         .then(stream => callback(stream))
-//         .catch(e => err(e))
-//     }
-//     return navigator.getUserMedia(options, callback,  err)
-//   }
+  return (
+    <div className="flex w-full items-center justify-center h-[100vh]">
+      <input
+        type="text"
+        placeholder="Введите буквы"
+        onChange={(event) => handleConnectPoints(event.target.value.toUpperCase())}
+      />
+      <svg width="500" height="500">
+        {points.map((point, index) => (
+          <g key={index}>
+            <circle cx={(point.x - xRange.min) * scale.x} cy={(point.y - yRange.min) * scale.y} r="8" fill="black" />
+            <text x={(point.x - xRange.min) * scale.x} y={(point.y - yRange.min) * scale.y + 15} textAnchor="middle" fontSize="12" fill="black">{point.letter}</text>
+          </g>
+        ))}
 
-//   onMedia(stream) {
-//     this.stream = stream
-//     this.forceUpdate() // we have stream
-//     this.socket = io(ioUrl)
-//     this.socket.on('peer', msg => {
-//       const peerId = msg.peerId
-//       debug('new peer poof!', peerId)
-//       if (peerId === this.socket.id) {
-//         return debug('Peer is me :D', peerId)
-//       }
-//       this.createPeer(peerId, true, stream)
-//     })
-//     this.socket.on('signal', data => {
-//       const peerId = data.from
-//       const peer = this.state.peers[peerId]
-//       if (!peer) {
-//         this.createPeer(peerId, false, stream)
-//       }
-//       debug('Setting signal', peerId, data)
-//       this.signalPeer(this.state.peers[peerId], data.signal)
-//     })
-//     this.socket.on('unpeer', msg => {
-//       debug('Unpeer', msg)
-//       this.destroyPeer(msg.peerId)
-//     })
-//   }
+        {connectedPoints.map(([start, end], index) => (
+          <line
+          className="line" /* добавляем класс "line" для применения стиля */
+          key={index}
+          x1={(points[start].x - xRange.min) * scale.x}
+          y1={(points[start].y - yRange.min) * scale.y}
+          x2={(points[end].x - xRange.min) * scale.x}
+          y2={(points[end].y - yRange.min) * scale.y}
+          fill="freeze"
+          stroke="black"
+        >
+          <animate
+              attributeName="x2"
+              from={(points[start].x - xRange.min) * scale.x}
+              to={(points[end].x - xRange.min) * scale.x}
+              dur="0.5s"
+              fill="freeze"
+            />
+            <animate
+              attributeName="y2"
+              from={(points[start].y - yRange.min) * scale.y}
+              to={(points[end].y - yRange.min) * scale.y}
+              dur="0.5s"
+              fill="freeze"
+            />
+        </line> 
+        ))}
+      </svg>
+    </div>
+  );
+}
 
-//   createPeer(peerId, initiator, stream) {
-//     debug('creating new peer', peerId, initiator)
-
-//     const peer = new Peer({initiator: initiator, trickle: enableTrickle, stream})
-
-//     peer.on('signal', (signal) => {
-//       const msgId = (new Date().getTime())
-//       const msg = { msgId, signal, to: peerId }
-//       debug('peer signal sent', msg)
-//       this.socket.emit('signal', msg)
-//     })
-
-//     peer.on('stream', (stream) => {
-//       debug('Got peer stream!!!', peerId, stream)
-//       peer.stream = stream
-//       this.setPeerState(peerId, peer)
-//     })
-
-//     peer.on('connect', () => {
-//       debug('Connected to peer', peerId)
-//       peer.connected = true
-//       this.setPeerState(peerId, peer)
-//       peer.send(this.serialize({
-//         msg: 'hey man!'
-//       }))
-//     })
-
-//     peer.on('data', data => {
-//       debug('Data from peer', peerId, this.unserialize(data))
-//     })
-
-//     peer.on('error', (e) => {
-//       debug('Peer error %s:', peerId, e);
-//     })
-
-//     this.setPeerState(peerId, peer)
-
-//     return peer
-//   }
-
-//   destroyPeer(peerId) {
-//     const peers = {...this.state.peers}
-//     delete peers[peerId]
-//     this.setState({
-//       peers
-//     })
-//   }
-
-//   serialize(data) {
-//     return JSON.stringify(data)
-//   }
-
-//   unserialize(data) {
-//     try {
-//       return JSON.parse(data.toString())
-//     } catch(e) {
-//       return undefined
-//     }
-//   }
-
-//   setPeerState(peerId, peer) {
-//     const peers = {...this.state.peers}
-//     peers[peerId] = peer
-//     this.setState({
-//       peers
-//     })
-//   }
-
-//   signalPeer(peer, data) {
-//     try {
-//       peer.signal(data)
-//     } catch(e) {
-//       debug('sigal error', e)
-//     }
-//   }
-
-//   renderPeers() {
-//     return Object.entries(this.state.peers).map(entry => {
-//       const [peerId, peer] = entry
-//       debug('render peer', peerId, peer, entry)
-//       return <div key={peerId}>
-//         <video ref={video => peer.video = video}></video>
-//       </div>
-//     })
-//   }
-
-//   render() {
-//     return (
-//       <div className="App">
-//         <header className="App-header">
-//           <img src={logo} className="App-logo" alt="logo" />
-//           <h1 className="App-title">WebRTC Video Chat</h1>
-//         </header>
-//         {this.state.mediaErr && (
-//           <p className="error">{this.state.mediaErr}</p>
-//         )}
-//         <div id="me">
-//           <video id="myVideo" ref={video => this.video = video} controls></video>
-//         </div>
-//         <div id="peers">{this.renderPeers()}</div>
-//       </div>
-//     );
-//   }
-// }
-
-// export default VideoChat;
+export default Test;

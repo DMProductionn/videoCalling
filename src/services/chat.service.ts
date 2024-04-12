@@ -9,11 +9,6 @@ export const createChat = async (theme: string, password: string, name: string) 
   return response.data
 }
 
-export const getUsersChat = async (chat_id: string | null) => {
-  const response = await http.get(`/chat/info-chat/${chat_id}`);
-  return response.data
-}
-
 export const getMessageChat = async (chat_id: string | null) => {
   const response = await http.get(`/chat/get_messages_chats?chat_id=${chat_id}`);
   return response.data
@@ -25,6 +20,5 @@ export const connectChat = async (id: string, name: string, password: string) =>
     password,
     name
   });
-  console.log(response.data);
   return response.data
 }

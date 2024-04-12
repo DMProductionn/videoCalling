@@ -1,7 +1,8 @@
 import '../../pages/Chat/Chat.scss'
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { httpWebSocket } from '../../Api/http';
 import { getMessageChat } from '../../services/chat.service';
+import WriteMessage from './WriteInPrivateMessage/WriteMessage';
 
 
 type TypeMessage = {
@@ -16,6 +17,9 @@ const ChatRightSide = () => {
   const [value, setValue] = useState('');
   const socket = useRef<WebSocket | null>();
   const [chatId, _] = useState(localStorage.getItem('chatId'));
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [contextMenu, setContextMenu] = useState(false);
+  const [selectedMessage, setSelectedMessage] = useState<number | null>(null);
 
   
 
@@ -50,6 +54,11 @@ const ChatRightSide = () => {
 }, []);
 
 
+useEffect(() => {
+  messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+}, [messages]);
+
+
 
 const sendMessage = async () => {
         const message = {
@@ -62,6 +71,12 @@ const sendMessage = async () => {
         }
         setValue('');
     } 
+
+    const handleClick = (e: React.MouseEvent<HTMLDivElement>, index: number | null) => {
+      e.preventDefault();
+      setContextMenu(!contextMenu);
+      setSelectedMessage(index);
+    }
 
 
   return (
@@ -81,7 +96,7 @@ const sendMessage = async () => {
             
             ? 
 
-            <div key={index} className={'message-wrapper reverse'}>
+            <div ref={messagesEndRef} key={index} className={'message-wrapper reverse'}>
               <div className="profile-picture">
                 <img src="https://images.unsplash.com/photo-1581824283135-0666cf353f35?ixlib=rb-1.2.1&auto=format&fit=crop&w=1276&q=80" alt="pp" />
               </div>
@@ -93,7 +108,7 @@ const sendMessage = async () => {
 
         : 
 
-        <div key={mess.id} className={'message-wrapper'}>
+        <div ref={messagesEndRef} onContextMenu={(e) => handleClick(e, index)} key={index} className={'message-wrapper relative'}>
               <div className="profile-picture">
                 <img src="https://images.unsplash.com/photo-1581824283135-0666cf353f35?ixlib=rb-1.2.1&auto=format&fit=crop&w=1276&q=80" alt="pp" />
               </div>
@@ -101,9 +116,11 @@ const sendMessage = async () => {
               <p className="name">{mess.name}</p>
               <div className="message">{mess.content}</div>
             </div>
+           { selectedMessage === index && <WriteMessage /> } 
         </div>
           ))
         }
+        
       </div>
       <div className="chat-typing-area-wrapper">
         <div className="chat-typing-area">

@@ -8,6 +8,11 @@ export default defineConfig({
   plugins: [react(),
     envCompatible()
   ],
+  resolve: {
+    alias: {
+      "simple-peer": "simple-peer/simplepeer.min.js",
+    },
+  },
   server: {
     port: 3000
   }
