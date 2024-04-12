@@ -7,12 +7,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.prod
-    volumes:
-      - react_dist:/app/dist
     ports:
       - 3000:3000
 
-volumes:
-  react_dist:
 
     
