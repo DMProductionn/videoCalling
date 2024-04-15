@@ -11,4 +11,9 @@ export const httpWebSocket = axios.create({
   withCredentials: true
 })
 
-export default http
+export const httpTest = axios.create({
+  baseURL: 'http://localhost:8000',
+  withCredentials: true
+})
+
+export default httpTest
