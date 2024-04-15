@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import useGetMe from "../hooks/useGetMe"
-import httpTest from "../Api/http";
+import Cookies from 'js-cookie';
 import axios from "axios";
 
 const Profile = () => {
@@ -11,28 +11,22 @@ const Profile = () => {
   console.log(data);
 
   useEffect(() => {
-    // Функция для извлечения refresh_token из куки
-    const getRefreshTokenFromCookie = () => {
-      const cookies = document.cookie.split(';');
-      for (let i = 0; i < cookies.length; i++) {
-        let cookie = cookies[i].trim();
-        if (cookie.startsWith('refresh_token=')) {
-          setRefreshToken(cookie.split('=')[1]); // Сохраняем refresh_token в состоянии
-          return;
-        }
-      }
-    };
+    const refreshToken = Cookies.get('refresh_token');
 
-    getRefreshTokenFromCookie(); // Вызываем функцию при монтировании компонента
+if (refreshToken) {
+    console.log(refreshToken);
+} else {
+    console.log('Refresh token not found in cookie');
+} 
   }, []);
 
   console.log(token);
   
 
   const refresh = async () => {
-    const res = await axios.post('http://localhost:8000/auth/refresh', {
-      token
-    })
+    const res = await axios.post('http://localhost:8000/auth/refresh', {}, {
+      withCredentials: true 
+    });
   }
 
 

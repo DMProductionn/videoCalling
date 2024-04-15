@@ -1,5 +1,6 @@
 import axios from "axios";
-import http, { httpTest } from "../Api/http"
+import httpTest from "../Api/http";
+import http from "../Api/http";
 
 export const regUser = async (email: string, password: string) => {
   const response = await http.post<{email: string, password: string}>('/auth/register', {
@@ -30,15 +31,22 @@ export const getMe = async () => {
 }
 
 
-http.interceptors.response.use(
+httpTest.interceptors.response.use(
   (response) => {
     return response;
   },
-  (error) => {
+  async (error) => {
     if (axios.isAxiosError(error) && error.response?.status === 401) {
-      return axios.post('localhost:8000/auth/refresh').then((response) => {
+      try {
+        const response = await httpTest.post('/auth/refresh');
         console.log('Token refreshed');
-      });
+        // Обновление токена успешно, повторяем исходный запрос
+        return httpTest.request(error.config);
+      } catch (refreshError) {
+        // Ошибка при обновлении токена
+        return Promise.reject(refreshError);
+      }
     }
+    return Promise.reject(error);
   }
 );
